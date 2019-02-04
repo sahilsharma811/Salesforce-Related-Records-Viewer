@@ -1,0 +1,117 @@
+<aura:component controller="ControllerRelatedRecordViewerComponent"
+                implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    
+    <aura:handler name="init"
+                  value="{!this}"
+                  action="{!c.onInit}"/>
+    
+    <aura:attribute name="selectedObject"
+                    type="String"
+                    default=""/>
+    
+    <aura:attribute name="selectedChildObjectName"
+                    type="String"
+                    default=""/>
+    
+    <aura:attribute name="wrapperObjectFields"
+                    type="List"
+                    default=""/>
+    
+    <aura:attribute name="selectedChildObjectFields"
+                    type="List"
+                    default=""/>
+    
+    <aura:attribute name="lstObjectName"
+                    type="List"
+                    default=""/>
+    
+    <aura:attribute name="lstChildObjectName"
+                    type="List"
+                    default=""/>    
+    
+    <aura:attribute name="columns"
+                    type="List"/>
+    
+    <aura:attribute name="showChildObjectFieldList"
+                    type="Boolean"
+                    default="false"/>
+    
+    <aura:attribute name="showChildObjects"
+                    type="Boolean"
+                    default="false"/>
+    
+    <aura:attribute name="showSpinner"
+                    type="Boolean"
+                    default="false"/>
+    
+    <lightning:card> 
+        <aura:set attribute="title">
+            <lightning:icon iconName="standard:sobject" size="small"/>
+            SObject Related Records
+        </aura:set>
+        <aura:set attribute="footer">
+            
+        </aura:set>
+        <aura:if isTrue="{!v.showSpinner}">
+            <lightning:spinner/>
+        </aura:if>
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds_large_size_1-of-2 slds_medium_size_1-of-1 slds_small_size_1-of-1">
+                <lightning:select label="Select a Object"
+                                  value="{!v.selectedObject}"
+                                  onchange="{!c.onObjectSelection}">
+                    <option text="--None--"/>
+                    <aura:iteration items="{!v.lstObjectName}"
+                                    var="item">
+                        <option value= "{!item.objectAPIName}" text="{!item.objectLabel}"/>
+                    </aura:iteration>
+                </lightning:select>
+            </div>
+            <div class="slds-col slds_large_size_1-of-2 slds_medium_size_1-of-1 slds_small_size_1-of-1">
+                <aura:if isTrue="{!v.showChildObjects}">
+                    <lightning:select label="Select Child Object"
+                                      value="{!v.selectedChildObjectName}"
+                                      onchange="{!c.onChildObjectSelection}">
+                        <option text="--None--" value=""/>
+                        <aura:iteration items="{!v.lstChildObjectName}"
+                                        var="item">
+                            <option value="{!item.childSObject}" text="{!item.childRelationShipName}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </aura:if>
+            </div>
+            <div class="slds-col slds_large_size_1-of-2 slds_medium_size_1-of-1 slds_small_size_1-of-1">
+                <aura:if isTrue="{!v.showChildObjectFieldList}">
+                    
+                    <lightning:dualListbox name="Child object fields"
+                                           value="{!v.selectedChildObjectFields}"
+                                           label= "Select fields" 
+                                           sourceLabel="Available" 
+                                           selectedLabel="Selected" 
+                                           fieldLevelHelp="Select child object fields" 
+                                           options="{!v.wrapperObjectFields}" 
+                                           onchange="{! c.onChildObjectFieldChange }"/>
+                    
+                    <!-- <lightning:icon iconName="utility:description" size="small"/> 
+                            <lightning:select label="Child Object Fields"
+                                              value="{!v.childObjectFields}"
+                                              onchange="">
+                                <aura:iteration items="{!v.wrapperObjectFields}"
+                                                var="item">
+                                    <option text="{!item.fieldLabel}" value="{!item.fieldAPIName}"/>
+                                </aura:iteration>
+                            </lightning:select>
+        -->
+                    <!--
+                                <lightning:datatable
+                                                     keyField="id"
+                                                     data="{! v.wrapperObjectFields}"
+                                                     columns="{! v.columns }"
+                                                     hideCheckboxColumn="true"/>
+                 -->
+                </aura:if>
+            </div>
+            
+        </div>
+    </lightning:card>
+</aura:component>
