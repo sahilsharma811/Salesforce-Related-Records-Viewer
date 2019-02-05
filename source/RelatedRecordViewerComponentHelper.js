@@ -38,6 +38,8 @@
         if (component.get('v.selectedObject') == '--None--'){
             component.set('v.showChildObjectFieldList', false);
             component.set('v.showChildObjects', false);
+            component.set('v.showObjectRecordList',false);
+            component.set('v.showChildObjectRecords',false);
             component.set('v.showSpinner', false);
             return;
         }
@@ -70,19 +72,51 @@
                     }
                 }
         });
+        
+        var fetchSelectedObjectRecords = component.get('c.fetchSelectedObjectRecords');
+        fetchSelectedObjectRecords.setParams({
+            objName : component.get('v.selectedObject')
+        });
+        $A.enqueueAction(fetchSelectedObjectRecords);
+        fetchSelectedObjectRecords.setCallback(this, function(response){
+            var state = response.getState();
+            if(state == 'SUCCESS'){
+                var result = response.getReturnValue();
+                component.set('v.SObjectRecords',result);
+                component.set('v.showSpinner', false);
+            }
+            else if(state == 'INCOMPLETE'){
+                component.set('v.showSpinner', false);
+            }
+            
+                else if(state == 'ERROR'){
+                    var errors = response.getError();
+                    if(errors){
+                        console.log('Error: ' + errors[0] + ' .Error Message: ' + errors[0].message);
+                        component.set('v.showObjectRecordList', false);
+                        component.set('v.showSpinner', false);
+                    }
+                    else{
+                        console.log('Unknown Error');
+                        component.set('v.showObjectRecordList', false);
+                        component.set('v.showSpinner', false);
+                    }
+                }
+        });
     },
     
     handleChildObjectSelection : function(component, event){
-    	component.set('v.showSpinner', true);
+        component.set('v.showSpinner', true);
         var fetchChildObjectDetails = component.get('c.fetchObjectDetails');
         if (component.get('v.selectedChildObjectName') == '--None--'){
             component.set('v.showChildObjectFieldList', false);
+            component.set('v.showObjectRecordList',false);
+            component.set('v.showChildObjectRecords',false);
             component.set('v.showSpinner', false);
             return;
         }
         fetchChildObjectDetails.setParams({'nameObj' : component.get('v.selectedChildObjectName')});
         $A.enqueueAction(fetchChildObjectDetails);
-        
         fetchChildObjectDetails.setCallback(this,function(response){
             var state = response.getState();
             if(state == 'SUCCESS'){
@@ -112,6 +146,63 @@
     }, 
     
     handleChildObjectFieldChange : function(component, event){
+        var objName = component.get('v.selectedObject');
         var selectedChildObjectFields = component.get('v.selectedChildObjectFields');
+        alert(selectedChildObjectFields);
+        if(selectedChildObjectFields == ''){
+            component.set('v.showObjectRecordList',false);
+            component.set('v.showChildObjectRecords',false); 
+            return;
+        }
+        component.set('v.showObjectRecordList', true);
+        /*
+       
+        */
+    }, 
+    
+    handleObjectRecordSelection : function(component, event){
+        var selectedChildObjectFields = component.get('v.selectedChildObjectFields');
+        var childObjectName = component.get('v.selectedChildObjectName');
+        var lstChildObjectName = component.get('v.lstChildObjectName');
+        var childRelationshipName = '';
+        for(var iter in lstChildObjectName){
+            if(lstChildObjectName[iter].childSObject == childObjectName){
+                childRelationshipName = lstChildObjectName[iter].childRelationShipName;
+            }
+        }
+        var fetchSObjectRecords = component.get('c.fetchSObjectRecords');
+        fetchSObjectRecords.setParams({
+            "objId" : component.get('v.idSelectedObject'),
+            "objName" : component.get('v.selectedObject'),
+            "childRelationshipName" : childRelationshipName,
+            "commaSeparatedFields" : selectedChildObjectFields
+        });
+        //$A.enqueueAction(fetchSObjectRecords);
+        fetchSObjectRecords.setCallback(this, function(response){
+            var state = response.getState();
+            if(state == 'SUCCESS'){
+                var result = response.getReturnValue();
+                component.set('v.childRecords',result[0]);
+                component.set('v.showChildObjectRecords',false);
+                component.set('v.showSpinner', false);
+            }
+            else if(state == 'INCOMPLETE'){
+                component.set('v.showSpinner', false);
+            }
+            
+                else if(state == 'ERROR'){
+                    var errors = response.getError();
+                    if(errors){
+                        console.log('Error: ' + errors[0] + ' .Error Message: ' + errors[0].message);
+                        component.set('v.showChildObjectRecords', false);
+                        component.set('v.showSpinner', false);
+                    }
+                    else{
+                        console.log('Unknown Error');
+                        component.set('v.showChildObjectRecords', false);
+                        component.set('v.showSpinner', false);
+                    }
+                }
+        });
     }
 })

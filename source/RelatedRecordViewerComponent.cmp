@@ -36,15 +36,32 @@
                     type="Boolean"
                     default="false"/>
     
+    <aura:attribute name="showObjectRecordList"
+                    type="Boolean"
+                    default="false"/>
+    
+    <aura:attribute name="showChildObjectRecords"
+                    type="Boolean"
+                    default="false"/>
+    
+    <aura:attribute name="SObjectRecords"
+                    type="SObject"/>
+    
+    <aura:attribute name="idSelectedObject"
+                    type="String"/>
+    
     <aura:attribute name="showChildObjects"
                     type="Boolean"
                     default="false"/>
+    
+    <aura:attribute name="childRecords"
+                    type="String"/>
     
     <aura:attribute name="showSpinner"
                     type="Boolean"
                     default="false"/>
     
-    <lightning:card> 
+    <lightning:card class="slds-p-around_small"> 
         <aura:set attribute="title">
             <lightning:icon iconName="standard:sobject" size="small"/>
             SObject Related Records
@@ -55,7 +72,7 @@
         <aura:if isTrue="{!v.showSpinner}">
             <lightning:spinner/>
         </aura:if>
-        <div class="slds-grid slds-wrap">
+        <div class="slds-grid slds-wrap slds-gutters">
             <div class="slds-col slds_large_size_1-of-2 slds_medium_size_1-of-1 slds_small_size_1-of-1">
                 <lightning:select label="Select a Object"
                                   value="{!v.selectedObject}"
@@ -72,10 +89,10 @@
                     <lightning:select label="Select Child Object"
                                       value="{!v.selectedChildObjectName}"
                                       onchange="{!c.onChildObjectSelection}">
-                        <option text="--None--" value=""/>
+                        <option text="--None--" value="--None--"/>
                         <aura:iteration items="{!v.lstChildObjectName}"
                                         var="item">
-                            <option value="{!item.childSObject}" text="{!item.childRelationShipName}"/>
+                            <option value="{!item.childSObject}" text="{!item.childObjLabel}"/>
                         </aura:iteration>
                     </lightning:select>
                 </aura:if>
@@ -109,6 +126,30 @@
                                                      columns="{! v.columns }"
                                                      hideCheckboxColumn="true"/>
                  -->
+                </aura:if>
+            </div>
+            <div class="slds-col slds_large_size_1-of-2 slds_medium_size_1-of-1 slds_small_size_1-of-1">
+                <aura:if isTrue="{!v.showObjectRecordList}">
+                    <lightning:select label="Choose Record"
+                                      value="{!v.idSelectedObject}"
+                                      onchange="{!c.onObjectRecordSelection}">
+                        <option text = "--None--" value="--None--"/>
+                        <aura:iteration items="{!v.SObjectRecords}"
+                                        var="item">
+                            <option text="{!item.Name}" value="{!item.Id}"/>
+                        </aura:iteration>
+                    </lightning:select>
+                </aura:if>
+            </div>
+            
+            <div class="slds-col slds_large_size_1-of-2 slds_medium_size_1-of-1 slds_small_size_1-of-1">
+                <aura:if isTrue="{!v.showChildObjectRecords}">
+                    
+                        <aura:iteration items="{!v.childRecords}"
+                                        var="item">
+                            <option text="{!item.Name}" value="{!item.Id}"/>
+                        </aura:iteration>
+                
                 </aura:if>
             </div>
             
