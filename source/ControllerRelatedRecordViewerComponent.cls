@@ -8,7 +8,7 @@ public class ControllerRelatedRecordViewerComponent {
             String objLabel = mapGlobalDescribe.get(objName).getDescribe().getLabel();
             listWrapperObjectDetails.add(new wrapperObjectDetail(objLabel, String.valueOf(mapGlobalDescribe.get(objName))));
         }
-        return listWrapperObjectDetails;
+         return listWrapperObjectDetails;
     }
     
     @AuraEnabled

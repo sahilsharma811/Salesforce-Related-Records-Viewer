@@ -30,7 +30,8 @@
                     default=""/>    
     
     <aura:attribute name="columns"
-                    type="List"/>
+                    type="List"
+                    default="[]"/>
     
     <aura:attribute name="showChildObjectFieldList"
                     type="Boolean"
@@ -141,15 +142,15 @@
                     </lightning:select>
                 </aura:if>
             </div>
-            
+            <br/>
             <div class="slds-col slds_large_size_1-of-2 slds_medium_size_1-of-1 slds_small_size_1-of-1">
                 <aura:if isTrue="{!v.showChildObjectRecords}">
+                    <lightning:datatable
+                                         keyField="id"
+                                         data="{!v.childRecords}"
+                                         columns="{! v.columns }"
+                                         hideCheckboxColumn="true"/>
                     
-                        <aura:iteration items="{!v.childRecords}"
-                                        var="item">
-                            <option text="{!item.Name}" value="{!item.Id}"/>
-                        </aura:iteration>
-                
                 </aura:if>
             </div>
             

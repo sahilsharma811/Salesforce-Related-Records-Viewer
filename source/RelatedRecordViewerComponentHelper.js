@@ -148,16 +148,13 @@
     handleChildObjectFieldChange : function(component, event){
         var objName = component.get('v.selectedObject');
         var selectedChildObjectFields = component.get('v.selectedChildObjectFields');
-        alert(selectedChildObjectFields);
         if(selectedChildObjectFields == ''){
             component.set('v.showObjectRecordList',false);
             component.set('v.showChildObjectRecords',false); 
             return;
         }
+        component.set('v.showChildObjectRecords',false);
         component.set('v.showObjectRecordList', true);
-        /*
-       
-        */
     }, 
     
     handleObjectRecordSelection : function(component, event){
@@ -177,13 +174,40 @@
             "childRelationshipName" : childRelationshipName,
             "commaSeparatedFields" : selectedChildObjectFields
         });
-        //$A.enqueueAction(fetchSObjectRecords);
+        $A.enqueueAction(fetchSObjectRecords);
         fetchSObjectRecords.setCallback(this, function(response){
             var state = response.getState();
             if(state == 'SUCCESS'){
                 var result = response.getReturnValue();
-                component.set('v.childRecords',result[0]);
-                component.set('v.showChildObjectRecords',false);
+                if($A.util.isUndefinedOrNull(result)){
+                    component.set('v.showChildObjectRecords',false);
+                    return;
+                }
+                console.log(JSON.stringify(result));
+                var keys = '';
+                var recordList = result[0];
+                var recordResult = new Array();
+                for(var key in recordList){
+                    for(var key2 in result[key]){
+                        recordResult.push(result[key][key2]);
+                    }
+                }
+                var mapOfFieldAPIToFieldDetail = [];
+                var column = new Array();
+                var selectedColumns = component.get('v.selectedChildObjectFields');
+                var wrapperObjectFields = component.get('v.wrapperObjectFields');
+                for(var key in wrapperObjectFields){
+                    if(selectedColumns.indexOf(wrapperObjectFields[key].value) != -1){
+                        var newEntry = {};
+                        newEntry['label'] = wrapperObjectFields[key].label;
+                        newEntry['fieldName'] = wrapperObjectFields[key].value;
+                        newEntry['type'] = wrapperObjectFields[key].dataType;
+                        column.push(newEntry);
+                    }
+                }
+                component.set('v.columns',column);
+                component.set('v.childRecords',recordResult);
+                component.set('v.showChildObjectRecords',true);
                 component.set('v.showSpinner', false);
             }
             else if(state == 'INCOMPLETE'){
